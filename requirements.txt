@@ -3,4 +3,7 @@ kazoo
 subprocess
 vagrant
 pexpect
-
+matplotlib
+numpy
+csv
+h5py
