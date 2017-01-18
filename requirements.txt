@@ -1,9 +1,6 @@
-kafka_test_utils
 kazoo
-subprocess
-vagrant
+python-vagrant
 pexpect
 matplotlib
 numpy
-csv
 h5py
