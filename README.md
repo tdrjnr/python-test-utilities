@@ -1,4 +1,4 @@
-# kafka-test-utils
+# kafka_test_utils
 Python utilities for implementing system and performance tests of Kafka clients.
 
 ## Dependencies
