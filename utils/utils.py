@@ -3,6 +3,10 @@ import numpy as np
 import csv
 import h5py
 
+"""
+Misc other useful functions
+"""
+
 
 def plot_metrics(results, ylabel="", title="", yscale=1):
     pl.figure()
@@ -18,6 +22,19 @@ def plot_metrics(results, ylabel="", title="", yscale=1):
 
 
 def nexus_files_equal(filename_1, filename_2):
+    """
+    Checking files are binary equal is not an option for HDF5 files,
+    so we are stuck reading and comparing datasets.
+
+    Files to compare must be in the current directory, can use
+    cd context manager to achieve this.
+
+    Floats are compared to a precision of 0.01
+
+    :param filename_1: name of file to compare with file with name filename_2
+    :param filename_2: name of file to compare with file with name filename_1
+    :return: True if equal (for the tested event datasets at least)
+    """
     success = True
     # entire small datasets can be loaded into memory
     small_datasets = [
