@@ -33,9 +33,11 @@ class JmxTool:
                    "/jmxrmi "
                    "--attributes " + attributes +
                    "--reporting-interval 2000")
+        self.host = host
+        self.attributes = attributes.strip()
         self.jmxtool = pexpect.spawn(command)
 
-    def get_output(self):
+    def get_output(self, plot=True):
         # Get all output
         results = ""
         try:
@@ -44,10 +46,14 @@ class JmxTool:
         except:
             pass
             # print("Error reading from JmxTool, buffer too small?")
+        self.plot_metrics(results)
         return results
 
-    @staticmethod
-    def plot_metrics(results, ylabel="", title="", yscale=1):
+    def plot_metrics(self, results, ylabel="", title="", yscale=1):
+        if not ylabel:
+            ylabel = self.attributes
+        if not title:
+            title = self.host
         pl.figure()
         reader = csv.reader(results.splitlines())
         data = []
