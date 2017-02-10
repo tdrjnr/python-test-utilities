@@ -4,6 +4,7 @@ import os
 class cd:
     """
     Context manager for changing the current working directory
+    Sets path back to original working directory on exit
     """
 
     def __init__(self, new_path):

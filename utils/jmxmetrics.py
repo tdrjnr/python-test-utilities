@@ -12,6 +12,8 @@ class JmxMetrics:
     def __init__(self, connection):
         """
         :param connection: JMX address in form <hostname>:<port>
+        NB, this is the port for JMX not Kafka, for example brokername:9999
+        You can get JMX ports from zookeeper using KafkaInfo.jmxports()
         """
         connection_timeout = 2
 
