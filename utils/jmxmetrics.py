@@ -7,6 +7,7 @@ from cd import cd
 class JmxMetrics:
     """
     Uses JMXTerm to get metrics from the Kafka broker
+    NB, NOT CURRENTLY WINDOWS COMPATIBLE
     """
 
     def __init__(self, connection):
@@ -15,6 +16,10 @@ class JmxMetrics:
         NB, this is the port for JMX not Kafka, for example brokername:9999
         You can get JMX ports from zookeeper using KafkaInfo.jmxports()
         """
+        if self._is_windows():
+            print("ERROR JmxMetrics will not run on Windows")
+            return
+
         connection_timeout = 2
 
         with cd(os.path.dirname(inspect.stack()[0][1])):
@@ -35,6 +40,10 @@ class JmxMetrics:
                 return response_lines
 
         return response_lines
+
+    @staticmethod
+    def _is_windows():
+        return os.name == 'nt'
 
     def __del__(self):
         self.jmxterm.sendline("quit")
