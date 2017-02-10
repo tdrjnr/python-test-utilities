@@ -2,7 +2,7 @@ import vagrant
 from cd import cd
 
 
-class Cluster:
+class VagrantUp:
     """
     Context manager for Vagrant VMs
     Will bring up the vagrant machines on entry and tear down on exit

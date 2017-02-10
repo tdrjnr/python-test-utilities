@@ -1,5 +1,5 @@
 from cd import *
-from cluster import *
+from vagrantup import *
 from jmxmetrics import *
 from jmxtool import *
 from kafkasubprocess import *
