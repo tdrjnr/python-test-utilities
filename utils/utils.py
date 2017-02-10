@@ -9,7 +9,9 @@ Misc other useful functions
 def nexus_files_equal(filename_1, filename_2):
     """
     Checking files are binary equal is not an option for HDF5 files,
-    so we are stuck reading and comparing datasets.
+    so we are stuck reading and comparing datasets; expect this to be slow.
+
+    Tested with NeXus files from ISIS, but should also work for SNS.
 
     Files to compare must be in the current directory, can use
     cd context manager to achieve this.
@@ -52,6 +54,8 @@ def nexus_files_equal(filename_1, filename_2):
             for dataset in datasets:
                 data_1 = f_read_1.get(dataset)
                 data_2 = f_read_2.get(dataset)
+                # Compare datasets a slice at a time to avoid large memory use
+                # TODO number of slices should depend on size of the dataset
                 n_slices = 10
                 slice_size = int(np.floor(len(data_1) / n_slices))
                 for n in range(1, n_slices):
