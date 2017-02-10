@@ -1,4 +1,7 @@
 import pexpect
+import inspect
+import os
+from cd import cd
 
 
 class JmxMetrics:
@@ -12,10 +15,11 @@ class JmxMetrics:
         """
         connection_timeout = 2
 
-        self.jmxterm = pexpect.spawn("java -jar jmxterm.jar")
-        self.jmxterm.expect_exact("$>")  # got prompt, can continue
-        self.jmxterm.sendline("open " + connection)
-        self.jmxterm.expect_exact("#Connection to " + connection + " is opened", connection_timeout)
+        with cd(os.path.dirname(inspect.stack()[0][1])):
+            self.jmxterm = pexpect.spawn("java -jar jmxterm.jar")
+            self.jmxterm.expect_exact("$>")  # got prompt, can continue
+            self.jmxterm.sendline("open " + connection)
+            self.jmxterm.expect_exact("#Connection to " + connection + " is opened", connection_timeout)
 
     def get_metric(self, bean_type, bean_name, bean_value):
         request = "get -b kafka.server:type=" + bean_type + ",name=" + bean_name + " " + bean_value
