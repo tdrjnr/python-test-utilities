@@ -1,5 +1,8 @@
 import os
 import pexpect
+import matplotlib.pyplot as pl
+import csv
+import numpy as np
 
 
 class JmxTool:
@@ -34,14 +37,27 @@ class JmxTool:
 
     def get_output(self):
         # Get all output
-        result = ""
+        results = ""
         try:
             for n in range(1, 10):
-                result = result + self.jmxtool.read_nonblocking(size=16777216, timeout=2)
+                results = results + self.jmxtool.read_nonblocking(size=16777216, timeout=2)
         except:
             pass
             # print("Error reading from JmxTool, buffer too small?")
-        return result
+        return results
+
+    @staticmethod
+    def plot_metrics(results, ylabel="", title="", yscale=1):
+        pl.figure()
+        reader = csv.reader(results.splitlines())
+        data = []
+        for row in reader:
+            data.append(row)
+        data = np.array(data)
+        pl.plot((data[1:, 0].astype(float) - data[1, 0].astype(float)) * 1e-3, data[1:, 1:].astype(float) * yscale)
+        pl.xlabel("time [s]")
+        pl.ylabel(ylabel)
+        pl.title(title)
 
     def __del__(self):
         self.jmxtool.close(force=True)

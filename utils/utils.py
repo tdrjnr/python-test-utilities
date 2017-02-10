@@ -1,24 +1,9 @@
-import matplotlib.pyplot as pl
 import numpy as np
-import csv
 import h5py
 
 """
 Misc other useful functions
 """
-
-
-def plot_metrics(results, ylabel="", title="", yscale=1):
-    pl.figure()
-    reader = csv.reader(results.splitlines())
-    data = []
-    for row in reader:
-        data.append(row)
-    data = np.array(data)
-    pl.plot((data[1:, 0].astype(float) - data[1, 0].astype(float)) * 1e-3, data[1:, 1:].astype(float) * yscale)
-    pl.xlabel("time [s]")
-    pl.ylabel(ylabel)
-    pl.title(title)
 
 
 def nexus_files_equal(filename_1, filename_2):
