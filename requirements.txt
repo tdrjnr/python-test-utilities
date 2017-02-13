@@ -1,6 +1,6 @@
 kazoo
 python-vagrant
-pexpect
+pexpect>=4.2
 matplotlib
 numpy
 h5py
