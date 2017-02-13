@@ -11,8 +11,21 @@ from cd import cd
 
 
 class JmxTool:
+    """
+    Collect metrics from Kafka brokers via JMX, continuous until object is destroyed
+    NB, if not already present in directory this downloads and extracts Kafka package which is ~30MB
+    """
+
     def __init__(self, host, topic="system_test_topic", metrics="broker", kafka_version="0.9.0.1",
-                 scala_version="2.11"):
+                 scala_version="2.11", interval_milliseconds=2000):
+        """
+        :param host: host address in format <hostname>:<port>
+        :param topic: topic name, used if metric is for a specific topic
+        :param metrics: metric type, allowed values are 'broker', 'cpu' and 'memory'
+        :param kafka_version: specify Kafka version, compatible with version on brokers
+        :param scala_version: specify Scala version
+        :param interval_milliseconds: interval at which to get a value for the metric
+        """
         with cd(os.path.dirname(inspect.stack()[0][1])):
             self._download_and_extract_kafka(kafka_version, scala_version)
 
@@ -44,7 +57,7 @@ class JmxTool:
                                  "service:jmx:rmi:///jndi/rmi://" + host +
                        "/jmxrmi "
                        "--attributes " + attributes +
-                       "--reporting-interval 2000")
+                       "--reporting-interval " + str(interval_milliseconds))
 
             if self._is_windows():
                 self.jmxtool = pexpect.popen_spawn.PopenSpawn(command)
@@ -90,6 +103,11 @@ class JmxTool:
         f.close()
 
     def get_output(self, plot=True):
+        """
+        Get all output collected since previous call of this function
+        :param plot: whether to also plot the output using matplotlib
+        :return: collected metric data
+        """
         # Get all output
         results = ""
         try:
@@ -103,6 +121,14 @@ class JmxTool:
         return results
 
     def plot_metrics(self, results, ylabel="", title="", yscale=1):
+        """
+        Plot the data
+        NB, you'll need to call pylab.show() at the end of your script to see plots
+        :param results: data, from get_output
+        :param ylabel: defaults to metric type
+        :param title: defaults to broker address
+        :param yscale: multiplication factor for the y values, defaults to 1
+        """
         if not ylabel:
             ylabel = self.attributes
         if not title:
