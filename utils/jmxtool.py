@@ -59,6 +59,7 @@ class JmxTool:
                    "--reporting-interval " + str(interval_milliseconds))
 
         if self._is_windows():
+            command.replace('\\', '/')
             self.jmxtool = pexpect.popen_spawn.PopenSpawn(command)
         else:
             self.jmxtool = pexpect.spawn(command)
@@ -101,7 +102,7 @@ class JmxTool:
             print status,
         f.close()
 
-    def get_output(self, plot=True):
+    def get_output(self):
         """
         Get all output collected since previous call of this function
         :param plot: whether to also plot the output using matplotlib
@@ -115,9 +116,8 @@ class JmxTool:
         except:
             pass
             # print("Error reading from JmxTool, buffer too small?")
-        if plot:
-            self.plot_metrics(results)
-        return results
+        plot_handle = self.plot_metrics(results)
+        return results, plot_handle
 
     def plot_metrics(self, results, ylabel="", title="", yscale=1):
         """
@@ -132,7 +132,7 @@ class JmxTool:
             ylabel = self.attributes
         if not title:
             title = self.host
-        pl.figure()
+        plot_handle = pl.figure()
         reader = csv.reader(results.splitlines())
         data = []
         for row in reader:
@@ -142,6 +142,7 @@ class JmxTool:
         pl.xlabel("time [s]")
         pl.ylabel(ylabel)
         pl.title(title)
+        return plot_handle
 
     @staticmethod
     def _is_windows():
