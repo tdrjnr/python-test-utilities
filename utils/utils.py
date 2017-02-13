@@ -1,23 +1,27 @@
-import matplotlib.pyplot as pl
 import numpy as np
-import csv
 import h5py
 
-
-def plot_metrics(results, ylabel="", title="", yscale=1):
-    pl.figure()
-    reader = csv.reader(results.splitlines())
-    data = []
-    for row in reader:
-        data.append(row)
-    data = np.array(data)
-    pl.plot((data[1:, 0].astype(float) - data[1, 0].astype(float)) * 1e-3, data[1:, 1:].astype(float) * yscale)
-    pl.xlabel("time [s]")
-    pl.ylabel(ylabel)
-    pl.title(title)
+"""
+Misc other useful functions
+"""
 
 
 def nexus_files_equal(filename_1, filename_2):
+    """
+    Checking files are binary equal is not an option for HDF5 files,
+    so we are stuck reading and comparing datasets; expect this to be slow.
+
+    Tested with NeXus files from ISIS, but should also work for SNS.
+
+    Files to compare must be in the current directory, can use
+    cd context manager to achieve this.
+
+    Floats are compared to a precision of 0.01
+
+    :param filename_1: name of file to compare with file with name filename_2
+    :param filename_2: name of file to compare with file with name filename_1
+    :return: True if equal (for the tested event datasets at least)
+    """
     success = True
     # entire small datasets can be loaded into memory
     small_datasets = [
@@ -50,6 +54,8 @@ def nexus_files_equal(filename_1, filename_2):
             for dataset in datasets:
                 data_1 = f_read_1.get(dataset)
                 data_2 = f_read_2.get(dataset)
+                # Compare datasets a slice at a time to avoid large memory use
+                # TODO number of slices should depend on size of the dataset
                 n_slices = 10
                 slice_size = int(np.floor(len(data_1) / n_slices))
                 for n in range(1, n_slices):

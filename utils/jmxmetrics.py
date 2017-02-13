@@ -1,21 +1,32 @@
 import pexpect
+import inspect
+import os
+from cd import cd
 
 
 class JmxMetrics:
     """
     Uses JMXTerm to get metrics from the Kafka broker
+    NB, NOT CURRENTLY WINDOWS COMPATIBLE
     """
 
     def __init__(self, connection):
         """
         :param connection: JMX address in form <hostname>:<port>
+        NB, this is the port for JMX not Kafka, for example brokername:9999
+        You can get JMX ports from zookeeper using KafkaInfo.jmxports()
         """
+        if self._is_windows():
+            print("ERROR JmxMetrics will not run on Windows")
+            return
+
         connection_timeout = 2
 
-        self.jmxterm = pexpect.spawn("java -jar jmxterm.jar")
-        self.jmxterm.expect_exact("$>")  # got prompt, can continue
-        self.jmxterm.sendline("open " + connection)
-        self.jmxterm.expect_exact("#Connection to " + connection + " is opened", connection_timeout)
+        with cd(os.path.dirname(inspect.stack()[0][1])):
+            self.jmxterm = pexpect.spawn("java -jar jmxterm.jar")
+            self.jmxterm.expect_exact("$>")  # got prompt, can continue
+            self.jmxterm.sendline("open " + connection)
+            self.jmxterm.expect_exact("#Connection to " + connection + " is opened", connection_timeout)
 
     def get_metric(self, bean_type, bean_name, bean_value):
         request = "get -b kafka.server:type=" + bean_type + ",name=" + bean_name + " " + bean_value
@@ -29,6 +40,10 @@ class JmxMetrics:
                 return response_lines
 
         return response_lines
+
+    @staticmethod
+    def _is_windows():
+        return os.name == 'nt'
 
     def __del__(self):
         self.jmxterm.sendline("quit")
