@@ -29,12 +29,11 @@ class JmxTool:
                 mbean2 = None
                 attributes = "HeapMemoryUsage "
 
+            bin_dir = os.path.join("kafka_" + scala_version + "-" + kafka_version, "bin")
             if self._is_windows():
-                # TODO
-                run_script = 'batch ...'
+                run_script = "batch " + os.path.join(bin_dir, "windows", "kafka-run-class.bat")
             else:
-                run_script = "bash " + os.path.join("kafka_" + scala_version + "-" + kafka_version, "bin",
-                                                    "kafka-run-class.sh")
+                run_script = "bash " + os.path.join(bin_dir, "kafka-run-class.sh")
 
             command = run_script + (" kafka.tools.JmxTool "
                                     "--object-name " + mbean1)
