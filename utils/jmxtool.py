@@ -29,7 +29,7 @@ class JmxTool:
 
         mbean1 = "'kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic=" + topic + "' "
         mbean2 = "'kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=" + topic + "' "
-        attributes = "OneMinuteRate "
+        attributes = "Count "
 
         if metrics is "cpu":
             mbean1 = "'java.lang:type=OperatingSystem' "
@@ -138,10 +138,21 @@ class JmxTool:
         for row in reader:
             data.append(row)
         data = np.array(data)
-        pl.plot((data[1:, 0].astype(float) - data[1, 0].astype(float)) * 1e-3, data[1:, 1:].astype(float) * yscale)
+        if self.attributes == "Count":
+            num_of_datasets = data.shape[1] - 1
+            for n in range(num_of_datasets):
+                time = (data[2:, 0].astype(float) - data[2, 0].astype(float)) * 1e-3
+                rate = [value - data[index - 1, n + 1] for index, value in enumerate(data[2:, n + 1].astype(float))]
+                pl.plot(time, rate * yscale, label=data[0, n + 1])
+        else:
+            num_of_datasets = data.shape[1] - 1
+            for n in range(num_of_datasets):
+                pl.plot((data[1:, 0].astype(float) - data[1, 0].astype(float)) * 1e-3,
+                        data[1:, n + 1].astype(float) * yscale, label=data[0, n + 1])
         pl.xlabel("time [s]")
         pl.ylabel(ylabel)
         pl.title(title)
+        pl.legend(loc="upper right")
         return plot_handle
 
     @staticmethod
