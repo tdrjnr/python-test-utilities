@@ -59,7 +59,7 @@ class JmxTool:
                    "--reporting-interval " + str(interval_milliseconds))
 
         if self._is_windows():
-            command.replace('\\', '/')
+            command = command.replace('\\', '/')
             self.jmxtool = pexpect.popen_spawn.PopenSpawn(command)
         else:
             self.jmxtool = pexpect.spawn(command)
