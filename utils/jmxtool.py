@@ -66,6 +66,7 @@ class JmxTool:
 
         self.host = host
         self.attributes = attributes.strip()
+        self.timestep = interval_milliseconds
 
     def _download_and_extract_kafka(self, extract_to_dir, kafka_version, scala_version):
         file_no_ext = 'kafka_' + scala_version + '-' + kafka_version
@@ -142,8 +143,10 @@ class JmxTool:
             num_of_datasets = data.shape[1] - 1
             for n in range(num_of_datasets):
                 time = (data[2:, 0].astype(float) - data[2, 0].astype(float)) * 1e-3
-                rate = [value - data[index - 1, n + 1] for index, value in enumerate(data[2:, n + 1].astype(float))]
-                pl.plot(time, rate * yscale, label=data[0, n + 1])
+                bytes_per_timestep = [value - data[index + 1, n + 1].astype(float) for index, value in
+                                      enumerate(data[2:, n + 1].astype(float))]
+                rate_bytes_per_sec = np.divide(bytes_per_timestep, self.timestep * 1e-3)
+                pl.plot(time, rate_bytes_per_sec * yscale, label=data[0, n + 1])
         else:
             num_of_datasets = data.shape[1] - 1
             for n in range(num_of_datasets):
