@@ -146,7 +146,8 @@ class JmxTool:
                 bytes_per_timestep = [value - data[index + 1, n + 1].astype(float) for index, value in
                                       enumerate(data[2:, n + 1].astype(float))]
                 rate_bytes_per_sec = np.divide(bytes_per_timestep, self.timestep * 1e-3)
-                pl.plot(time, rate_bytes_per_sec * yscale, label=data[0, n + 1])
+                mbean_name = data[0, n + 1].split(',')[-2].split('=')[-1]
+                pl.plot(time, rate_bytes_per_sec * yscale, label=mbean_name)
         else:
             num_of_datasets = data.shape[1] - 1
             for n in range(num_of_datasets):
@@ -155,7 +156,7 @@ class JmxTool:
         pl.xlabel("time [s]")
         pl.ylabel(ylabel)
         pl.title(title)
-        pl.legend(loc="upper right")
+        pl.legend(bbox_to_anchor=(1.0, 1.1))
         return plot_handle
 
     @staticmethod
